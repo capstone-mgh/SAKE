@@ -43,7 +43,7 @@ from test import app
 application = app
 ````
 
-Edit the bottom of the httpd.conf configuration file to give access permission to your directory and point your url 
+Edit the bottom of the httpd.conf configuration file to give access permission to your directory and point your url
 ````
 vim /opt/bitnami/apache2/conf/httpd.conf
 ````
@@ -58,4 +58,14 @@ WSGIScriptAlias /flasktest /opt/bitnami/apps/flask/test/test.wsgi
 Restart the Apache server
 ````
 /opt/bitnami/ctlscript.sh restart apache
+````
+# Useful Commands
+To refresh cache after updating Flask app
+````
+rm *pyc; /opt/bitnami/ctlscript.sh restart apache
+````
+
+To tail server logs (requests and python print statements)
+````
+tail -f /opt/bitnami/apache2/logs/*log
 ````

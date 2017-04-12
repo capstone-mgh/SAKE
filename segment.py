@@ -2,12 +2,13 @@
 #Flask rest endpoint for segmentation
 from flask import Flask, request
 import json
+import numpy as np
 from sake import Sake
 app = Flask(__name__)
 
 @app.route("/version")
 def index():
-        return "0.12"
+        return "0.16"
 
 @app.route("/segment")
 def segment():
@@ -27,8 +28,18 @@ def segment():
 
         sake = Sake(path)
         print "webparams", x, y, z
-        polygon = sake.segmentImage(z, x, y)
-        return json.dumps(polygon.tolist())
+        #mask, mask_offset, polygon = sake.segmentImage(z, x, y)
+        #TODO fix this coordinates hack
+        mask, mask_offset, polygon = sake.segmentImage(z, y, x)
+        mask = mask.T
+        mask_offset = np.array([mask_offset[1], mask_offset[0]])
+        polygon = np.column_stack((polygon[:,1], polygon[:,0]))
+        data = {
+                "mask": mask.tolist(),
+                "maskOffset": mask_offset.tolist(),
+                "polygon": polygon.tolist()
+        }
+        return json.dumps(data)
 
 @app.errorhandler(404)
 def page_not_found(e):
