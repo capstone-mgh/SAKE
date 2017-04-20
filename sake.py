@@ -21,7 +21,7 @@ class Sake:
 			for filename in fileList:
 				if ".dcm" in filename.lower():  # check whether the file's DICOM
 					lstFilesDCM.append(os.path.join(dirName,filename))
-								
+
 		# Get ref file
 		RefDs = dicom.read_file(lstFilesDCM[0])
 
@@ -40,7 +40,7 @@ class Sake:
 			ds = dicom.read_file(filenameDCM)
 			# store the raw image data
 			self.imagesArray[ds.InstanceNumber-1, :, :] = ds.pixel_array
-		
+
 		return self.imagesArray.shape
 
 	def getImage(self, z):
@@ -55,7 +55,7 @@ class Sake:
 		less = np.less_equal(image,image[x,y]+tolerance)
 		return binary_propagation(input = input_mask, mask = greater*less)
 
-	def segmentImage(self, z, x, y, threshold=0.1, x_bound=64, y_bound=64, thinning=1):
+	def segmentImage(self, z, x, y, threshold=0.1, x_bound=2000, y_bound=2000, thinning=1):
 		x_offset = max(0, x - x_bound)
 		y_offset = max(0, y - y_bound)
 		x_bounding = slice(x_offset, min(self.imagesArray.shape[1], x + x_bound))
@@ -65,16 +65,6 @@ class Sake:
 		new_y = y - y_offset
 		segmented_slice = self.output_mask(new_x, new_y, bounding_slice, threshold)
 		contour_slice = find_contours(segmented_slice, level=0.5)
-
-		print "Debug"
-		print x, y, z
-		print x_offset, y_offset
-		print x_bounding, y_bounding
-		print self.imagesArray.shape
-		print bounding_slice.shape
-		print bounding_slice
-		print segmented_slice.shape
-		print segmented_slice
-		print contour_slice
-
-		return contour_slice[0][::thinning] + np.array([x_offset, y_offset])
+		mask_offset = np.array([x_offset, y_offset])
+		polygon = contour_slice[0][::thinning] + mask_offset
+		return segmented_slice, mask_offset, polygon
