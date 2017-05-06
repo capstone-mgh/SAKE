@@ -1,14 +1,16 @@
 #!/usr/bin/python
 #Flask rest endpoint for segmentation
 from flask import Flask, request
+from flask_cors import CORS
 import json
 import numpy as np
 from sake import Sake
 app = Flask(__name__)
+CORS(app)
 
 @app.route("/version")
 def index():
-    return "0.17"
+    return "0.18"
 
 @app.route("/segment")
 def segment():
@@ -30,9 +32,9 @@ def segment():
     #patient name
     patientName = request.args.get("patientName", "")
     #window width
-    windowWidth = int(request.args.get("windowWidth", 400))
+    windowWidth = float(request.args.get("windowWidth", 400))
     #window center
-    windowCenter = int(request.args.get("windowCenter", 40))
+    windowCenter = float(request.args.get("windowCenter", 40))
     #series id
     seriesInstanceUid = request.args.get("seriesInstanceUid", "")
     #instance id
@@ -42,14 +44,17 @@ def segment():
     #mask, mask_offset, polygon = sake.segmentImage(z, x, y)
     #TODO fix this coordinates hack
     mask, mask_offset, polygon = sake.segmentImage(z, y, x)
-    mask = mask.T
-    mask_offset = np.array([mask_offset[1], mask_offset[0]])
-    polygon = np.column_stack((polygon[:,1], polygon[:,0]))
-    data = {
-            "mask": mask.tolist(),
-            "maskOffset": mask_offset.tolist(),
-            "polygon": polygon.tolist()
-    }
+    if polygon is not None:
+        mask = mask.T
+        mask_offset = np.array([mask_offset[1], mask_offset[0]])
+        polygon = np.column_stack((polygon[:,1], polygon[:,0]))
+        data = {
+                "mask": mask.tolist(),
+                "maskOffset": mask_offset.tolist(),
+                "polygon": polygon.tolist()
+        }
+    else:
+        data = {}
     #frontend expects a json object with polygon and optionally mask + maskOffset
     #returning a blank object or object with empty polygon will stop z-propagation
     return json.dumps(data)
