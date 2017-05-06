@@ -67,7 +67,7 @@ class Sake:
 		area = len(np.where(segmented_slice == 1.)[0])
 		# filter by max area
 		if area > max_size:
-			return np.array(), np.array(), np.array()
+			return None, None, None
 		contour_slice = find_contours(segmented_slice, level=0.5)
 		mask_offset = np.array([x_offset, y_offset])
 		polygon = contour_slice[0][::thinning] + mask_offset
