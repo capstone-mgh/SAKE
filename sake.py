@@ -51,11 +51,11 @@ class Sake:
 		input_mask = np.zeros_like(image)
 		input_mask[x,y] = 1
 		tolerance *= np.max(image)
-		greater = np.greater_equal(image,image[x,y]-tolerance)
-		less = np.less_equal(image,image[x,y]+tolerance)
+		greater = np.greater_equal(image, image[x,y] - tolerance)
+		less = np.less_equal(image, image[x,y] + tolerance)
 		return binary_propagation(input = input_mask, mask = greater*less)
 
-	def segmentImage(self, z, x, y, threshold=0.1, x_bound=2000, y_bound=2000, thinning=1):
+	def segmentImage(self, z, x, y, threshold=0.1, x_bound=2000, y_bound=2000, thinning=1, max_size = 1000):
 		x_offset = max(0, x - x_bound)
 		y_offset = max(0, y - y_bound)
 		x_bounding = slice(x_offset, min(self.imagesArray.shape[1], x + x_bound))
@@ -64,6 +64,10 @@ class Sake:
 		new_x = x - x_offset
 		new_y = y - y_offset
 		segmented_slice = self.output_mask(new_x, new_y, bounding_slice, threshold)
+		area = len(np.where(segmented_slice == 1.)[0])
+		# filter by max area
+		if area > max_size:
+			return np.array(), np.array(), np.array()
 		contour_slice = find_contours(segmented_slice, level=0.5)
 		mask_offset = np.array([x_offset, y_offset])
 		polygon = contour_slice[0][::thinning] + mask_offset
