@@ -10,7 +10,7 @@ CORS(app)
 
 @app.route("/version")
 def index():
-    return "0.18"
+    return "0.20"
 
 @app.route("/segment")
 def segment():
@@ -41,13 +41,8 @@ def segment():
     sopInstanceUid = request.args.get("sopInstanceUid", "")
 
     sake = Sake("/opt/bitnami/apache2/htdocs/" + patientName)
-    #mask, mask_offset, polygon = sake.segmentImage(z, x, y)
-    #TODO fix this coordinates hack
     mask, mask_offset, polygon = sake.segmentImage(z, y, x)
     if polygon is not None:
-        mask = mask.T
-        mask_offset = np.array([mask_offset[1], mask_offset[0]])
-        polygon = np.column_stack((polygon[:,1], polygon[:,0]))
         data = {
                 "mask": mask.tolist(),
                 "maskOffset": mask_offset.tolist(),
