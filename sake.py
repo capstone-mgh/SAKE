@@ -72,6 +72,4 @@ class Sake:
 		mask_offset = np.array([x_offset, y_offset])
 		polygon = contour_slice[0] + mask_offset
 		polygon = np.column_stack((polygon[:,1], polygon[:,0])) #convert to x,y
-		#convention: y,x (row,column) for segmented_slice
-		#x,y for mask_offset and polygon
 		return segmented_slice, mask_offset, polygon
