@@ -36,7 +36,6 @@ class Model():
 
     	# convnet model initialization
         self.model = self.create_model(new_model=False)
-
         # kde model initialization
         self.kde = create_kde()
 
@@ -80,7 +79,7 @@ class Model():
     '''
     def create_model(self, new_model=False):
         if (not new_model):
-            model = model_from_json(open(self.models_dir + self.filename + '.json').read())
+            model = model_from_json(open(self.models_dir + self.model_filename + '.json').read())
         else:
             input = Input(shape=(1, self.patchZ, self.patchSize, self.patchSize))
             x = Conv3D(32, (1, 3, 3), activation='relu', padding='valid')(input)
