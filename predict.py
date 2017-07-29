@@ -101,8 +101,8 @@ class Model():
 
             model = Model(inputs=input, outputs=probs)
 
-        self.model.load_weights(self.models_dir + self.model_filename + '_weights.h5')
-        self.model.compile(loss = 'mean_squared_error', optimizer = Adam(lr = 0.00001), metrics = ['accuracy'])
+        model.load_weights(self.models_dir + self.model_filename + '_weights.h5')
+        model.compile(loss = 'mean_squared_error', optimizer = Adam(lr = 0.00001), metrics = ['accuracy'])
 
         return model
 
